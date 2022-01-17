@@ -56,6 +56,12 @@ replaceStr project_server_name $serverName ./images/nginx/1.18/config/magento2.c
 
 replaceStr project_name $dockerName ./images/nginx/1.18/config/nginx.conf.sample
 
+######################################
+### Set init_start file ##
+######################################
+
+replaceStr project_name $dockerName ./init_start
+
 
 ######################################
 ### Set docker-compose.yml file ##

@@ -1,9 +1,14 @@
-		Database changes
+		Start project
+1) Run init_config to setup docker configuration
+2) Copy project to server directory
+3) Change env file
+4) Run install_dump to setup database dump
+5) Run init_start 
+
+        Database changes
 core_config_data table:
     - set base url with port (http://test.loc::8088/)
     - for elasticsearch, in 'path' column find %elasticsearch%, set elasticsearch_container_name
-            
-
 
 		PhpStorm + PHP  + Docker + Xdebug  Settings
 - docker-compose file at php container add:
