@@ -31,11 +31,10 @@ replaceStr db_user_password $dbPassword ./env/db.env
 ## Set install_dump file ##
 ###########################
 
-replaceStr project_name $dockerName ./env/db.env
-replaceStr db_root_password $dbRootPassword ./env/db.env
-replaceStr db_name $databaseName ./env/db.env
-replaceStr db_user_name $dbUser ./env/db.env
-replaceStr db_user_password $dbPassword ./env/db.env
+replaceStr project_name $dockerName ./install_dump
+replaceStr db_name $databaseName ./install_dump
+replaceStr db_user_name $dbUser ./install_dump
+replaceStr db_user_password $dbPassword ./install_dump
 
 ##################################
 ## Set create_database.sql file ##
