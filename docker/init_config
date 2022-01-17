@@ -71,4 +71,4 @@ replaceStr port_myAdmin $dockerPortMyAdmin ./docker-compose.yml
 
 echo "#!/bin/bash
 
-docker exec -i mysql_$dockerName mysql -u$dbUser -p$dbPassword $databaseName < \$1" > ./install_dump_2
+docker exec -i mysql_$dockerName mysql -u$dbUser -p$dbPassword $databaseName < \$1" > ./install_dump
