@@ -1,0 +1,5 @@
+CREATE DATABASE IF NOT EXISTS db_name;
+
+GRANT ALL PRIVILEGES ON *.* TO db_user_name@'%' IDENTIFIED BY 'db_user_password';
+
+FLUSH PRIVILEGES;

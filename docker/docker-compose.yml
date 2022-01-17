@@ -1,0 +1,140 @@
+version: "3"
+
+services:
+  nginx_project_name:
+    container_name: nginx_project_name
+    build:
+      context: ./images/nginx/1.18
+      dockerfile: Dockerfile
+    ports:
+      - "80project_port:80"
+    volumes:
+      - ../server:/var/www/html/server:cached
+      - ./images/nginx/1.18/config/nginx.conf.sample:/etc/nginx/magento2.conf.sample:cached
+      - ./images/nginx/1.18/config/magento2.conf:/etc/nginx/conf.d/magento2.conf:cached
+    links:
+      - mysql_project_name
+      - php-fpm_project_name
+#      - redis_project_name
+    restart: unless-stopped
+    networks:
+      - backend-php
+
+  php-fpm_project_name:
+    container_name: php-fpm_project_name
+    build:
+      context: ./images/php/7.4
+      dockerfile: Dockerfile
+    ports:
+      - 90project_port:9000
+    env_file: env/phpfpm.env
+    volumes:
+      - sock:/sock
+      - ../server/:/var/www/html/server:cached
+      - ./images/php/7.4/config/xdebug.ini:/etc/php/7.4/mods-available/xdebug.ini:cached
+      - ~/.composer:/home/www/.composer:cached
+    links:
+      - mysql_project_name
+      - elasticsearch_project_name
+#      - redis_project_name
+    restart: unless-stopped
+    environment:
+      PHP_IDE_CONFIG: serverName=Docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - backend-php
+
+  mysql_project_name:
+    container_name: mysql_project_name
+    image: mariadb:10.4
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 33project_port:3306
+    env_file: env/db.env
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql:cached
+      - ./images/mysql:/docker-entrypoint-initdb.d:cached
+      - ./images/mysql/config/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf:cached
+    restart: unless-stopped
+    networks:
+      - backend-php
+
+  elasticsearch_project_name:
+    container_name: elasticsearch_project_name
+    image: elasticsearch:7.9.3
+    ports:
+      - 92project_port:9200
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "cluster.routing.allocation.disk.threshold_enabled=false"
+      - "index.blocks.read_only_allow_delete"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data:cached
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    restart: unless-stopped
+    networks:
+      - backend-php
+
+#  redis_project_name:
+#    container_name: redis_project_name
+#    image: redis:6.0.16
+#    restart: unless-stopped
+#    networks:
+#      - backend-php
+
+  phpmyadmin_project_name:
+    container_name: phpmyadmin_project_name
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "80port_myAdmin:80"
+    environment:
+      - PMA_ARBITRARY=1
+    volumes:
+      - /sessions
+    external_links:
+      - mysql_project_name
+    depends_on:
+      - mysql_project_name
+#      - redis_project_name
+    restart: unless-stopped
+    networks:
+      - backend-php
+
+#  mailcatcher_project_name:
+#    container_name: mailcatcher_project_name
+#    image: sj26/mailcatcher
+#    ports:
+#      - "10project_port:1080"
+#    restart: unless-stopped
+#    networks:
+#      - backend-php
+
+#  rabbitmq_project_name:
+#    container_name: rabbitmq_project_name
+#    image: rabbitmq:3.8.22-management-alpine
+#    ports:
+#      - "156project_port:15672"
+#      - "56project_port:5672"
+#    env_file: ./env/rabbitmq.env
+#    volumes:
+#      - ./volumes/rebbitmq:/var/lib/rabbitmq
+#    restart: unless-stopped
+#    networks:
+#      - backend-php
+
+networks:
+  backend-php:
+    driver: bridge
+
+volumes:
+  sock:
+  es-data:
+    driver: local

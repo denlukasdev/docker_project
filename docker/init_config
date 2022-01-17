@@ -1,0 +1,74 @@
+#!/bin/bash
+echo Start
+echo Input config settings
+
+function replaceStr {
+  sed -i "s/$1/$2/g" $3
+}
+
+read -p 'Project name for docker (ex: projectname): ' dockerName
+read -p 'Port  (ex: 88): ' dockerPort
+dockerPortMyAdmin=$(($dockerPort + 1))
+read -p 'Server name: ' serverName
+
+read -p 'MYSQL_ROOT_PASSWORD: ' dbRootPassword
+read -p 'MYSQL_DATABASE: ' databaseName
+read -p 'MYSQL_USER: ' dbUser
+read -p 'MYSQL_PASSWORD: ' dbPassword
+
+
+
+#####################
+## Set db.env file ##
+#####################
+
+replaceStr project_name $dockerName ./env/db.env
+replaceStr db_root_password $dbRootPassword ./env/db.env
+replaceStr db_name $databaseName ./env/db.env
+replaceStr db_user_name $dbUser ./env/db.env
+replaceStr db_user_password $dbPassword ./env/db.env
+
+##################################
+## Set create_database.sql file ##
+##################################
+
+replaceStr db_name $databaseName ./images/mysql/create_database.sql
+replaceStr db_user_name $dbUser ./images/mysql/create_database.sql
+replaceStr db_user_password $dbPassword ./images/mysql/create_database.sql
+
+############################
+## Set magento2.conf file ##
+############################
+
+replaceStr project_server_name $serverName ./images/nginx/1.18/config/magento2.conf
+
+######################################
+### Set nginx.conf.sample file ##
+######################################
+
+replaceStr project_name $dockerName ./images/nginx/1.18/config/nginx.conf.sample
+
+
+######################################
+### Set docker-compose.yml file ##
+######################################
+
+replaceStr project_name $dockerName ./docker-compose.yml
+replaceStr project_port $dockerPort ./docker-compose.yml
+replaceStr port_myAdmin $dockerPortMyAdmin ./docker-compose.yml
+
+###############################
+## Creating bin/magento file ##
+###############################
+
+#mkdir ../bin
+#echo "#!/bin/bash
+#docker exec -it php-fpm_$dockerName bin/magento \$*" > ../bin/magento
+
+###############################
+## Creating dump script file ##
+###############################
+
+echo "#!/bin/bash
+
+docker exec -i mysql_$dockerName mysql -u$dbUser -p$dbPassword $databaseName < \$1" > ./install_dump_2

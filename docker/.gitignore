@@ -1,0 +1,4 @@
+volumes/*
+!volomes
+images/mysql/dumps/*
+!images/mysql/dumps
