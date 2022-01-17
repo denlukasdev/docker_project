@@ -27,6 +27,15 @@ replaceStr db_root_password $dbRootPassword ./env/db.env
 replaceStr db_name $databaseName ./env/db.env
 replaceStr db_user_name $dbUser ./env/db.env
 replaceStr db_user_password $dbPassword ./env/db.env
+###########################
+## Set install_dump file ##
+###########################
+
+replaceStr project_name $dockerName ./env/db.env
+replaceStr db_root_password $dbRootPassword ./env/db.env
+replaceStr db_name $databaseName ./env/db.env
+replaceStr db_user_name $dbUser ./env/db.env
+replaceStr db_user_password $dbPassword ./env/db.env
 
 ##################################
 ## Set create_database.sql file ##
@@ -69,6 +78,6 @@ replaceStr port_myAdmin $dockerPortMyAdmin ./docker-compose.yml
 ## Creating dump script file ##
 ###############################
 
-echo "#!/bin/bash
-
-docker exec -i mysql_$dockerName mysql -u$dbUser -p$dbPassword $databaseName < \$1" > ./install_dump
+#echo "#!/bin/bash
+#
+#docker exec -i mysql_$dockerName mysql -u$dbUser -p$dbPassword $databaseName < \$1" > ./install_dump
