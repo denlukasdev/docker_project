@@ -49,6 +49,7 @@ mysqlCreateDBPath=../images/mysql/create_database.sql
 magentoConfPath=../config/nginx/magento2.conf
 magentoConfSamplePath=../config/nginx/magento2.conf.sample
 dockerComposePath=../docker-compose.yml
+firstStartPath=./first_start
 
 #####################
 ## Set db.env file ##
@@ -89,13 +90,6 @@ replaceStr project_server_name $serverName $magentoConfPath
 
 replaceStr project_name $dockerName $magentoConfSamplePath
 
-##########################
-### Set init_start file ## !!!!!!!!!!!!!   ??????????  !!!!!!!!!!!!!!!!!!!!!!!!
-##########################
-
-replaceStr project_name $dockerName ./init_start
-
-
 ##################################
 ### Set docker-compose.yml file ##
 ##################################
@@ -109,5 +103,6 @@ replaceStr port_myAdmin $dockerPortMyAdmin $dockerComposePath
 ## Set first_start script file ##
 #################################
 
+replaceStr project_name $dockerName $firstStartPath
 
 
