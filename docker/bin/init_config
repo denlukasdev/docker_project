@@ -1,5 +1,32 @@
 #!/bin/bash
 echo Start
+##################################################
+## Creating directory and env_files from sample ##
+##################################################
+if [ -d "../server" ]
+then
+    echo "Directory ../server exists."
+else
+    mkdir ../server
+    echo "Directory ../server created."
+fi
+
+if [ -f "./env/db.env" ]
+then
+    echo "File ./env/db.env exists."
+else
+    cp ./env/db.env.sample ./env/db.env
+    echo "File ./env/db.env created."
+fi
+
+if [ -f "./images/mysql/create_database.sql" ]
+then
+    echo "File ./images/mysql/create_database.sql exists."
+else
+    cp ./images/mysql/create_database.sql.sample ./images/mysql/create_database.sql
+    echo "File ./images/mysql/create_database.sql created."
+fi
+
 echo Input config settings
 
 function replaceStr {
@@ -16,73 +43,71 @@ read -p 'MYSQL_DATABASE: ' databaseName
 read -p 'MYSQL_USER: ' dbUser
 read -p 'MYSQL_PASSWORD: ' dbPassword
 
-
+dbEnvFilePath=../env/db.env
+installDumpPath=./install_dump
+mysqlCreateDBPath=../images/mysql/create_database.sql
+magentoConfPath=../config/nginx/magento2.conf
+magentoConfSamplePath=../config/nginx/magento2.conf.sample
+dockerComposePath=../docker-compose.yml
 
 #####################
 ## Set db.env file ##
 #####################
 
-replaceStr project_name $dockerName ./env/db.env
-replaceStr db_root_password $dbRootPassword ./env/db.env
-replaceStr db_name $databaseName ./env/db.env
-replaceStr db_user_name $dbUser ./env/db.env
-replaceStr db_user_password $dbPassword ./env/db.env
+replaceStr project_name $dockerName $dbEnvFilePath
+replaceStr db_root_password $dbRootPassword $dbEnvFilePath
+replaceStr db_name $databaseName $dbEnvFilePath
+replaceStr db_user_name $dbUser $dbEnvFilePath
+replaceStr db_user_password $dbPassword $dbEnvFilePath
+
 ###########################
 ## Set install_dump file ##
 ###########################
 
-replaceStr project_name $dockerName ./install_dump
-replaceStr db_name $databaseName ./install_dump
-replaceStr db_user_name $dbUser ./install_dump
-replaceStr db_user_password $dbPassword ./install_dump
+replaceStr project_name $dockerName $installDumpPath
+replaceStr db_name $databaseName $installDumpPath
+replaceStr db_user_name $dbUser $installDumpPath
+replaceStr db_user_password $dbPassword $installDumpPath
 
 ##################################
 ## Set create_database.sql file ##
 ##################################
 
-replaceStr db_name $databaseName ./images/mysql/create_database.sql
-replaceStr db_user_name $dbUser ./images/mysql/create_database.sql
-replaceStr db_user_password $dbPassword ./images/mysql/create_database.sql
+replaceStr db_name $databaseName $mysqlCreateDBPath
+replaceStr db_user_name $dbUser $mysqlCreateDBPath
+replaceStr db_user_password $dbPassword $mysqlCreateDBPath
 
 ############################
 ## Set magento2.conf file ##
 ############################
 
-replaceStr project_server_name $serverName ./images/nginx/1.18/config/magento2.conf
+replaceStr project_server_name $serverName $magentoConfPath
 
-######################################
+#################################
 ### Set nginx.conf.sample file ##
-######################################
+#################################
 
-replaceStr project_name $dockerName ./images/nginx/1.18/config/nginx.conf.sample
+replaceStr project_name $dockerName $magentoConfSamplePath
 
-######################################
-### Set init_start file ##
-######################################
+##########################
+### Set init_start file ## !!!!!!!!!!!!!   ??????????  !!!!!!!!!!!!!!!!!!!!!!!!
+##########################
 
 replaceStr project_name $dockerName ./init_start
 
 
-######################################
+##################################
 ### Set docker-compose.yml file ##
-######################################
+##################################
 
-replaceStr project_name $dockerName ./docker-compose.yml
-replaceStr project_port $dockerPort ./docker-compose.yml
-replaceStr port_myAdmin $dockerPortMyAdmin ./docker-compose.yml
+replaceStr project_name $dockerName $dockerComposePath
+replaceStr project_port $dockerPort $dockerComposePath
+replaceStr port_myAdmin $dockerPortMyAdmin $dockerComposePath
 
-###############################
-## Creating bin/magento file ##
-###############################
 
-#mkdir ../bin
-#echo "#!/bin/bash
-#docker exec -it php-fpm_$dockerName bin/magento \$*" > ../bin/magento
+#################################
+## Set first_start script file ##
+#################################
 
-###############################
-## Creating dump script file ##
-###############################
 
-#echo "#!/bin/bash
-#
-#docker exec -i mysql_$dockerName mysql -u$dbUser -p$dbPassword $databaseName < \$1" > ./install_dump
+

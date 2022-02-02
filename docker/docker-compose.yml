@@ -10,18 +10,18 @@ services:
       - "80project_port:80"
     volumes:
       - ../server:/var/www/html/server:cached
-      - ./images/nginx/1.18/config/nginx.conf.sample:/etc/nginx/magento2.conf.sample:cached
-      - ./images/nginx/1.18/config/magento2.conf:/etc/nginx/conf.d/magento2.conf:cached
+      - ./config/nginx/magento2.conf.sample:/etc/nginx/magento2.conf.sample:cached
+      - ./config/nginx/magento2.conf:/etc/nginx/conf.d/magento2.conf:cached
     links:
       - mysql_project_name
-      - php-fpm_project_name
+      - php_fpm_project_name
 #      - redis_project_name
     restart: unless-stopped
     networks:
-      - backend-php
+      - backend-php_project_name
 
-  php-fpm_project_name:
-    container_name: php-fpm_project_name
+  php_fpm_project_name:
+    container_name: php_fpm_project_name
     build:
       context: ./images/php/7.4
       dockerfile: Dockerfile
@@ -31,7 +31,10 @@ services:
     volumes:
       - sock:/sock
       - ../server/:/var/www/html/server:cached
-      - ./images/php/7.4/config/xdebug.ini:/etc/php/7.4/mods-available/xdebug.ini:cached
+      - ./config/php/xdebug.ini:/etc/php/7.4/mods-available/xdebug.ini:cached
+      - ./config/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:cached
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini:cached
+      - ./config/php/msmtprc:/etc/msmtprc:cached
       - ~/.composer:/home/www/.composer:cached
     links:
       - mysql_project_name
@@ -43,7 +46,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - backend-php
+      - backend-php_project_name
 
   mysql_project_name:
     container_name: mysql_project_name
@@ -53,12 +56,13 @@ services:
       - 33project_port:3306
     env_file: env/db.env
     volumes:
+      - ../server/:/var/www/html/server:cached
       - ./volumes/mysql:/var/lib/mysql:cached
       - ./images/mysql:/docker-entrypoint-initdb.d:cached
-      - ./images/mysql/config/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf:cached
+      - ./conf/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf:cached
     restart: unless-stopped
     networks:
-      - backend-php
+      - backend-php_project_name
 
   elasticsearch_project_name:
     container_name: elasticsearch_project_name
@@ -81,14 +85,14 @@ services:
         hard: 65536
     restart: unless-stopped
     networks:
-      - backend-php
+      - backend-php_project_name
 
 #  redis_project_name:
 #    container_name: redis_project_name
 #    image: redis:6.0.16
 #    restart: unless-stopped
 #    networks:
-#      - backend-php
+#      - backend-php_project_name
 
   phpmyadmin_project_name:
     container_name: phpmyadmin_project_name
@@ -106,7 +110,7 @@ services:
 #      - redis_project_name
     restart: unless-stopped
     networks:
-      - backend-php
+      - backend-php_project_name
 
 #  mailcatcher_project_name:
 #    container_name: mailcatcher_project_name
@@ -115,7 +119,7 @@ services:
 #      - "10project_port:1080"
 #    restart: unless-stopped
 #    networks:
-#      - backend-php
+#      - backend-php_project_name
 
 #  rabbitmq_project_name:
 #    container_name: rabbitmq_project_name
@@ -128,10 +132,10 @@ services:
 #      - ./volumes/rebbitmq:/var/lib/rabbitmq
 #    restart: unless-stopped
 #    networks:
-#      - backend-php
+#      - backend-php_project_name
 
 networks:
-  backend-php:
+  backend-php_project_name:
     driver: bridge
 
 volumes:

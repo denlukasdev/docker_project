@@ -1,4 +1,3 @@
 volumes/*
-!volomes
-images/mysql/dumps/*
-!images/mysql/dumps
+env/db.env
+images/mysql/create_database.sql
