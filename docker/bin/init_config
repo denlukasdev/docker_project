@@ -1,29 +1,31 @@
 #!/bin/bash
 echo Start
+initLocation=$PWD/$(dirname $0)
+
 ##################################################
 ## Creating directory and env_files from sample ##
 ##################################################
-if [ -d "../server" ]
+if [ -d "$initLocation/../../server" ]
 then
     echo "Directory ../server exists."
 else
-    mkdir ../server
+    mkdir $initLocation/../../server
     echo "Directory ../server created."
 fi
 
-if [ -f "./env/db.env" ]
+if [ -f "$initLocation/../env/db.env" ]
 then
     echo "File ./env/db.env exists."
 else
-    cp ./env/db.env.sample ./env/db.env
+    cp $initLocation/../env/db.env.sample $initLocation/../env/db.env
     echo "File ./env/db.env created."
 fi
 
-if [ -f "./images/mysql/create_database.sql" ]
+if [ -f "$initLocation/../images/mysql/create_database.sql" ]
 then
     echo "File ./images/mysql/create_database.sql exists."
 else
-    cp ./images/mysql/create_database.sql.sample ./images/mysql/create_database.sql
+    cp $initLocation/../images/mysql/create_database.sql.sample $initLocation/../images/mysql/create_database.sql
     echo "File ./images/mysql/create_database.sql created."
 fi
 
@@ -33,23 +35,27 @@ function replaceStr {
   sed -i "s/$1/$2/g" $3
 }
 
-read -p 'Project name for docker (ex: projectname): ' dockerName
-read -p 'Port  (ex: 88): ' dockerPort
+read -rp 'Project name for docker (ex: projectname): ' dockerName
+read -rp 'Port  (ex: 88): ' dockerPort
 dockerPortMyAdmin=$(($dockerPort + 1))
-read -p 'Server name: ' serverName
+read -rp 'Server name: ' serverName
 
-read -p 'MYSQL_ROOT_PASSWORD: ' dbRootPassword
-read -p 'MYSQL_DATABASE: ' databaseName
-read -p 'MYSQL_USER: ' dbUser
-read -p 'MYSQL_PASSWORD: ' dbPassword
+read -srp 'MYSQL_ROOT_PASSWORD: ' dbRootPassword
+echo ''
+read -rp 'MYSQL_DATABASE: ' databaseName
+read -rp 'MYSQL_USER: ' dbUser
+read -srp 'MYSQL_PASSWORD: ' dbPassword
+echo ''
 
-dbEnvFilePath=../env/db.env
-installDumpPath=./install_dump
-mysqlCreateDBPath=../images/mysql/create_database.sql
-magentoConfPath=../config/nginx/magento2.conf
-magentoConfSamplePath=../config/nginx/magento2.conf.sample
-dockerComposePath=../docker-compose.yml
-firstStartPath=./first_start
+
+dbEnvFilePath=$initLocation/../env/db.env
+installDumpPath=$initLocation/./install_dump
+mysqlCreateDBPath=$initLocation/../images/mysql/create_database.sql
+magentoConfPath=$initLocation/../config/nginx/magento2.conf
+magentoConfSamplePath=$initLocation/../config/nginx/magento2.conf.sample
+dockerComposePath=$initLocation/../docker-compose.yml
+firstStartPath=$initLocation/./first_start
+indocPath=$initLocation/./indoc
 
 #####################
 ## Set db.env file ##
@@ -104,5 +110,11 @@ replaceStr port_myAdmin $dockerPortMyAdmin $dockerComposePath
 #################################
 
 replaceStr project_name $dockerName $firstStartPath
+
+###########################
+## Set indoc script file ##
+###########################
+
+replaceStr project_name $dockerName $indocPath
 
 
