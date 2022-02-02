@@ -1,0 +1,120 @@
+#!/bin/bash
+echo Start
+initLocation=$PWD/$(dirname $0)
+
+##################################################
+## Creating directory and env_files from sample ##
+##################################################
+if [ -d "$initLocation/../../server" ]
+then
+    echo "Directory ../server exists."
+else
+    mkdir $initLocation/../../server
+    echo "Directory ../server created."
+fi
+
+if [ -f "$initLocation/../env/db.env" ]
+then
+    echo "File ./env/db.env exists."
+else
+    cp $initLocation/../env/db.env.sample $initLocation/../env/db.env
+    echo "File ./env/db.env created."
+fi
+
+if [ -f "$initLocation/../images/mysql/create_database.sql" ]
+then
+    echo "File ./images/mysql/create_database.sql exists."
+else
+    cp $initLocation/../images/mysql/create_database.sql.sample $initLocation/../images/mysql/create_database.sql
+    echo "File ./images/mysql/create_database.sql created."
+fi
+
+echo Input config settings
+
+function replaceStr {
+  sed -i "s/$1/$2/g" $3
+}
+
+read -rp 'Project name for docker (ex: projectname): ' dockerName
+read -rp 'Port  (ex: 88): ' dockerPort
+dockerPortMyAdmin=$(($dockerPort + 1))
+read -rp 'Server name: ' serverName
+
+read -srp 'MYSQL_ROOT_PASSWORD: ' dbRootPassword
+echo ''
+read -rp 'MYSQL_DATABASE: ' databaseName
+read -rp 'MYSQL_USER: ' dbUser
+read -srp 'MYSQL_PASSWORD: ' dbPassword
+echo ''
+
+
+dbEnvFilePath=$initLocation/../env/db.env
+installDumpPath=$initLocation/./install_dump
+mysqlCreateDBPath=$initLocation/../images/mysql/create_database.sql
+magentoConfPath=$initLocation/../config/nginx/magento2.conf
+magentoConfSamplePath=$initLocation/../config/nginx/magento2.conf.sample
+dockerComposePath=$initLocation/../docker-compose.yml
+firstStartPath=$initLocation/./first_start
+indocPath=$initLocation/./indoc
+
+#####################
+## Set db.env file ##
+#####################
+
+replaceStr project_name $dockerName $dbEnvFilePath
+replaceStr db_root_password $dbRootPassword $dbEnvFilePath
+replaceStr db_name $databaseName $dbEnvFilePath
+replaceStr db_user_name $dbUser $dbEnvFilePath
+replaceStr db_user_password $dbPassword $dbEnvFilePath
+
+###########################
+## Set install_dump file ##
+###########################
+
+replaceStr project_name $dockerName $installDumpPath
+replaceStr db_name $databaseName $installDumpPath
+replaceStr db_user_name $dbUser $installDumpPath
+replaceStr db_user_password $dbPassword $installDumpPath
+
+##################################
+## Set create_database.sql file ##
+##################################
+
+replaceStr db_name $databaseName $mysqlCreateDBPath
+replaceStr db_user_name $dbUser $mysqlCreateDBPath
+replaceStr db_user_password $dbPassword $mysqlCreateDBPath
+
+############################
+## Set magento2.conf file ##
+############################
+
+replaceStr project_server_name $serverName $magentoConfPath
+
+#################################
+### Set nginx.conf.sample file ##
+#################################
+
+replaceStr project_name $dockerName $magentoConfSamplePath
+
+##################################
+### Set docker-compose.yml file ##
+##################################
+
+replaceStr project_name $dockerName $dockerComposePath
+replaceStr project_port $dockerPort $dockerComposePath
+replaceStr port_myAdmin $dockerPortMyAdmin $dockerComposePath
+
+
+#################################
+## Set first_start script file ##
+#################################
+
+replaceStr project_name $dockerName $firstStartPath
+
+###########################
+## Set indoc script file ##
+###########################
+
+replaceStr project_name $dockerName $indocPath
+
+

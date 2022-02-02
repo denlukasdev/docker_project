@@ -1,7 +1,5 @@
 FROM nginx:1.18
 
-MAINTAINER Roman Sliusar <roman.sliusar95@gmail.com>
-
 RUN touch /var/run/nginx.pid
 RUN mkdir /sock
 
