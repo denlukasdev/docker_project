@@ -59,7 +59,7 @@ services:
       - ../server/:/var/www/html/server:cached
       - ./volumes/mysql:/var/lib/mysql:cached
       - ./images/mysql:/docker-entrypoint-initdb.d:cached
-      - ./conf/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf:cached
+      - ./config/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf:cached
     restart: unless-stopped
     networks:
       - backend-php_project_name
