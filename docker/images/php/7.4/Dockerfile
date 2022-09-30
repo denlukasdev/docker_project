@@ -37,13 +37,25 @@ RUN apt-get update && apt-get install -y \
      && pecl install mcrypt && docker-php-ext-enable mcrypt \
      && docker-php-ext-install -j$(nproc) bz2 bcmath intl soap gd xsl sockets zip pdo_mysql pdo_pgsql ldap tidy \
      && docker-php-ext-enable opcache \
-     && pecl install xdebug && docker-php-ext-enable xdebug \
      && npm install --global bower \
      && version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;")
+
+# Setup xdebug last version (3+)
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
+# Setup xdebug version <3
+#RUN pecl install xdebug-2.9.8 && docker-php-ext-enable xdebug
 
 RUN apt-get install -y msmtp mailutils
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+RUN \
+curl -sS -O https://files.magerun.net/n98-magerun2-latest.phar &&  \
+curl -sS -o n98-magerun2-latest.phar.sha256 https://files.magerun.net/sha256.php?file=n98-magerun2-latest.phar && \
+shasum -a 256 -c n98-magerun2-latest.phar.sha256 && \
+chmod +x n98-magerun2-latest.phar && \
+mv n98-magerun2-latest.phar /usr/local/bin/n98-magerun2-latest.phar
 
 RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
  && curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
@@ -59,5 +71,11 @@ USER www-data
 USER root
 
 RUN usermod -u 1000 www-data
+
+# Add magento  aliases
+RUN echo 'alias m="bin/magento"' >> ~/.bashrc \
+    && echo 'alias mdl="rm -rf generated/* && rm -rf var/cache/* && rm -rf var/page_cache/* && rm -rf var/view_preprocessed/* && rm -rf pub/static/* && php bin/magento setup:upgrade && php bin/magento c:f"' >> ~/.bashrc \
+    && echo 'alias mcf="rm -rf var/cache/* var/page_cache/* var/view_preprocessed/*  pub/static/frontend/* pub/static/*/*"' >> ~/.bashrc \
+    && echo 'alias mrm="rm -rf generated/*"' >> ~/.bashrc
 
 WORKDIR /var/www/html/server
