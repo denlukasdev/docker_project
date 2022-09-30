@@ -37,9 +37,14 @@ RUN apt-get update && apt-get install -y \
      && pecl install mcrypt && docker-php-ext-enable mcrypt \
      && docker-php-ext-install -j$(nproc) bz2 bcmath intl soap gd xsl sockets zip pdo_mysql pdo_pgsql ldap tidy \
      && docker-php-ext-enable opcache \
-     && pecl install xdebug && docker-php-ext-enable xdebug \
      && npm install --global bower \
      && version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;")
+
+# Setup xdebug last version (3+)
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
+# Setup xdebug version <3
+#RUN pecl install xdebug-2.9.8 && docker-php-ext-enable xdebug
 
 RUN apt-get install -y msmtp mailutils
 
@@ -66,5 +71,11 @@ USER www-data
 USER root
 
 RUN usermod -u 1000 www-data
+
+# Add magento  aliases
+RUN echo 'alias m="bin/magento"' >> ~/.bashrc \
+    && echo 'alias mdl="rm -rf generated/* && rm -rf var/cache/* && rm -rf var/page_cache/* && rm -rf var/view_preprocessed/* && rm -rf pub/static/* && php bin/magento setup:upgrade && php bin/magento c:f"' >> ~/.bashrc \
+    && echo 'alias mcf="rm -rf var/cache/* var/page_cache/* var/view_preprocessed/*  pub/static/frontend/* pub/static/*/*"' >> ~/.bashrc \
+    && echo 'alias mrm="rm -rf generated/*"' >> ~/.bashrc
 
 WORKDIR /var/www/html/server
