@@ -74,7 +74,7 @@ RUN usermod -u 1000 www-data
 
 # Add magento  aliases
 RUN echo 'alias m="bin/magento"' >> ~/.bashrc \
-    && echo 'alias mdl="rm -rf generated/* && rm -rf var/cache/* && rm -rf var/page_cache/* && rm -rf var/view_preprocessed/* && rm -rf pub/static/* && php bin/magento setup:upgrade && php bin/magento c:f"' >> ~/.bashrc \
+    && echo 'alias mdl="rm -rf generated/* && rm -rf var/cache/* && rm -rf var/page_cache/* && rm -rf var/view_preprocessed/* && rm -rf pub/static/* && php bin/magento setup:upgrade && php bin/magento setup:di:compile && php bin/magento c:f"' >> ~/.bashrc \
     && echo 'alias mcf="rm -rf var/cache/* var/page_cache/* var/view_preprocessed/*  pub/static/frontend/* pub/static/*/*"' >> ~/.bashrc \
     && echo 'alias mrm="rm -rf generated/*"' >> ~/.bashrc
 
